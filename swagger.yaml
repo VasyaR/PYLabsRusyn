@@ -1,0 +1,327 @@
+openapi: 3.0.3
+info:
+  title: StudentRating API
+  version: 1.0.0
+tags:
+  - name: Students
+    description: Students management
+  - name: Universities
+    description: University management 
+  - name: Ratings
+    description: Rating management
+paths:
+  /Universities:
+    get: # get list of Universities
+      tags:
+        - Universities
+      summary: Get all Universitiess
+      operationId: getUniversities
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/University'
+    post: # Add Unversity
+      tags:
+        - Universities
+      summary: Add an University
+      operationId: createUniversity
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/University'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/University'
+        '400':
+          description: Bad Request             
+  /Universities/{UniversityId}:
+    parameters:
+      - name: UniversityId
+        in: path
+        description: The id of the University
+        required: true
+        schema:
+          type: integer  
+    get: # get University
+      tags:
+        - Universities
+      summary: Get a University
+      operationId: getUniversity
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/University'
+        '404':
+          description: Not Found
+    put: # update University data (check status)
+      tags:
+        - Universities
+      summary: Edit University data
+      operationId: editUniversity
+      parameters:
+        - name: UniversityName
+          in: query
+          description: University name
+          required: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/University'
+        '400':
+          description: Bad Request
+        '404':
+          description: Not Found
+    post: # add University to Universities (check status)
+      tags:
+        - Universities
+      summary: Add a University to a Universities
+      operationId: addUniversitytoUniversities
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/University'
+        required: true
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/University'
+        '400':
+          description: Bad Request
+        '404':
+          description: Not Found
+    delete: # remove University (check owner)
+      tags:
+        - Universities
+      summary: Delete an University
+      operationId: deleteUniversity
+      responses:
+        '204':
+          description: No Content
+        '404':
+          description: Not Found
+  /Universities/{UniversitiesId}/{RatingId}:
+    parameters:
+      - name: UniversitiesId
+        in: path
+        description: University ID
+        required: true
+        schema:
+          type: integer
+      - name: RatingId
+        in: path
+        description: Rating ID
+        required: true
+        schema:
+          type: integer
+    get: # get university rating (ID includes year and semestr)
+      tags:
+       - Ratings
+      summary: Get a Rating
+      operationId: getRating
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Rating'
+        '404':
+          description: Not Found
+    post: # create raing(check status)
+      tags:
+        - Ratings
+      summary: Add a Rating
+      operationId: addRating
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Rating'
+        required: true
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Rating'
+        '400':
+          description: Bad Request
+        '404':
+          description: Not Found
+    delete: #delete Rating (check status)
+      tags:
+        - Ratings
+      summary: Delete a Rating
+      operationId: deleteRating
+      responses:
+        '204':
+          description: No Content
+        '404':
+          description: Not Found       
+  /Students:
+    get: # get Students
+      tags:
+        - Students
+      summary: Get all Students
+      operationId: getStudents
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Student'  
+    post: # create Student (check status)
+      tags:
+        - Students
+      summary: Create a Student
+      operationId: createStudent
+      parameters:
+        - name: Studentname
+          in: query
+          description: The Studentname
+          required: true
+          schema:
+            type: string
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Student'
+        '400':
+          description: Bad Request      
+  /Students/{StudentId}:
+    parameters:
+      - name: StudentId
+        in: path
+        description: The id of the Student
+        required: true
+        schema:
+          type: integer
+    get: # get Student
+      tags:
+        - Students
+      summary: Get a Student
+      operationId: getStudent
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Student'
+        '404':
+          description: Not Found
+    put: # update user Student
+      tags:
+        - Students
+      summary: Edit Student data
+      operationId: editStudent
+      parameters:
+        - name: username
+          in: query
+          description: Username
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Student'
+        '400':
+          description: Bad Request
+        '404':
+          description: Not Found
+    delete: # remove Student (check status)
+        tags:
+          - Students
+        summary: Delete a Student
+        operationId: deleteStudent
+        responses:
+          '204':
+            description: No Content
+          '404':
+            description: Not Found
+components:
+  schemas:
+    University:
+      type: object
+      properties:
+        id:
+          type: string
+          example: DK6IRG4CAbw
+        title:
+          type: string
+          example: IKHI
+        Ratings:
+          type: array
+          items:
+            $ref: '#/components/schemas/Rating'
+    Student:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        Studentame:
+          type: string
+          example: somename
+        University:
+          type: object
+          example: IKHI
+        Ratings:
+          type: array
+          items:
+            $ref: '#/components/schemas/Rating'
+    Rating:
+      type: object
+      properties:
+        ID:
+          type: integer
+          example: 20221
+        Ratelist:
+          type: array
+          items:
+            type: object
+            properties:
+              Student:
+                $ref: '#/components/schemas/Student'
+              Points:
+                type: number
+                example: 99.2417
+    
+        
+    
+        
+        
