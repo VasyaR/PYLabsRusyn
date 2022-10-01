@@ -44,7 +44,12 @@ paths:
               schema:
                 $ref: '#/components/schemas/University'
         '400':
-          description: Bad Request             
+          description: Bad Request  
+        '401':
+          description: No Permission
+      security:
+        - admin_auth:
+          - admin
   /Universities/{UniversityId}:
     parameters:
       - name: UniversityId
@@ -88,8 +93,11 @@ paths:
                 $ref: '#/components/schemas/University'
         '400':
           description: Bad Request
-        '404':
-          description: Not Found
+        '401':
+          description: No Permission
+      security:
+        - admin_auth:
+          - admin
     post: # add University to Universities (check status)
       tags:
         - Universities
@@ -110,8 +118,11 @@ paths:
                 $ref: '#/components/schemas/University'
         '400':
           description: Bad Request
-        '404':
-          description: Not Found
+        '401':
+          description: No Permission
+      security:
+        - admin_auth:
+          - admin
     delete: # remove University (check owner)
       tags:
         - Universities
@@ -122,6 +133,11 @@ paths:
           description: No Content
         '404':
           description: Not Found
+        '401':
+          description: No Pernission
+      security:
+        - admin_auth:
+          - admin
   /Universities/{UniversitiesId}/{RatingId}:
     parameters:
       - name: UniversitiesId
@@ -170,8 +186,11 @@ paths:
                 $ref: '#/components/schemas/Rating'
         '400':
           description: Bad Request
-        '404':
-          description: Not Found
+        '401': 
+          description: No Permission
+      security:
+        - admin_auth:
+          - admin
     delete: #delete Rating (check status)
       tags:
         - Ratings
@@ -181,7 +200,12 @@ paths:
         '204':
           description: No Content
         '404':
-          description: Not Found       
+          description: Not Found 
+        '401':
+          description: No permission
+      security:
+        - admin_auth:
+          - admin
   /Students:
     get: # get Students
       tags:
@@ -217,7 +241,12 @@ paths:
               schema:
                 $ref: '#/components/schemas/Student'
         '400':
-          description: Bad Request      
+          description: Bad Request 
+        '401':
+          description: No Permission
+      security:
+        - admin_auth:
+          - admin
   /Students/{StudentId}:
     parameters:
       - name: StudentId
@@ -261,8 +290,11 @@ paths:
                 $ref: '#/components/schemas/Student'
         '400':
           description: Bad Request
-        '404':
-          description: Not Found
+        '401':
+          description: No Permission
+      security:
+        - admin_auth:
+          - admin
     delete: # remove Student (check status)
         tags:
           - Students
@@ -273,6 +305,11 @@ paths:
             description: No Content
           '404':
             description: Not Found
+          '401':
+            description: No Permission
+        security:
+          - admin_auth:
+              - admin
 components:
   schemas:
     University:
@@ -320,8 +357,12 @@ components:
               Points:
                 type: number
                 example: 99.2417
-    
-        
-    
-        
+  securitySchemes:            
+    admin_auth:
+      type: oauth2
+      flows:
+        implicit:
+          authorizationUrl: https://Studrate.com/authorize
+          scopes:
+            admin: All rights
         
