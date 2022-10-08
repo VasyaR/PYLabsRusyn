@@ -3,366 +3,1031 @@ info:
   title: StudentRating API
   version: 1.0.0
 tags:
-  - name: Students
-    description: Students management
-  - name: Universities
-    description: University management 
-  - name: Ratings
-    description: Rating management
+  - name: admin
+    description: Admin management
+  - name: student
+    description: Student management
+  - name: teacher
+    description: Teacher management
+  - name: university
+    description: University management
 paths:
-  /Universities:
-    get: # get list of Universities
-      tags:
-        - Universities
-      summary: Get all Universitiess
-      operationId: getUniversities
-      responses:
-        '200':
-          description: OK
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/University'
-    post: # Add Unversity
-      tags:
-        - Universities
-      summary: Add an University
-      operationId: createUniversity
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/University'
-      responses:
-        '201':
-          description: Created
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/University'
-        '400':
-          description: Bad Request  
-        '401':
-          description: No Permission
-      security:
-        - admin_auth:
-          - admin
-  /Universities/{UniversityId}:
-    parameters:
-      - name: UniversityId
-        in: path
-        description: The id of the University
-        required: true
-        schema:
-          type: integer  
-    get: # get University
-      tags:
-        - Universities
-      summary: Get a University
-      operationId: getUniversity
-      responses:
-        '200':
-          description: OK
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/University'
-        '404':
-          description: Not Found
-    put: # update University data (check status)
-      tags:
-        - Universities
-      summary: Edit University data
-      operationId: editUniversity
+  /admin:
+    post: 
+      tags: 
+        - admin
+      summary: Add a new admin
+      operationId: addNewAdmin
       parameters:
-        - name: UniversityName
+        - name: login
           in: query
-          description: University name
+          required: true
+          example: Dungeon
+          schema:
+            type: string
+            example: Dungeon
+        - name: password
+          in: query
+          required: true
+          schema:
+            type: string
+            example: Master
+      responses:
+        '200':
+          description: Created a new admin
+          content:
+            application/json:
+              schema:
+                type: integer
+                minimum: 0
+        '400':
+          description: Bad request
+        '401':
+          description: Unauthorized
+        '403':
+          description: Not enough permissions
+      security:
+        - auth:
+          - admin
+          
+  /admin/{admin_id}:
+    post:
+      tags:
+        - admin
+      summary: Update the admin
+      operationId: updateAdmin
+      parameters:
+        - name: admin_id
+          in: path
+          required: true
+          schema:
+            type: integer
+            example: 0
+        - name: new_password
+          in: query
           required: false
           schema:
             type: string
-      responses:
-        '200':
-          description: OK
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/University'
-        '400':
-          description: Bad Request
-        '401':
-          description: No Permission
-      security:
-        - admin_auth:
-          - admin
-    post: # add University to Universities (check status)
-      tags:
-        - Universities
-      summary: Add a University to a Universities
-      operationId: addUniversitytoUniversities
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/University'
-        required: true
-      responses:
-        '200':
-          description: OK
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/University'
-        '400':
-          description: Bad Request
-        '401':
-          description: No Permission
-      security:
-        - admin_auth:
-          - admin
-    delete: # remove University (check owner)
-      tags:
-        - Universities
-      summary: Delete an University
-      operationId: deleteUniversity
+            example: "secret"
       responses:
         '204':
-          description: No Content
+          description: The admin was updated
         '404':
-          description: Not Found
+          description: The admin was not found
         '401':
-          description: No Pernission
+          description: Unauthorized
+        '403':
+          description: Not enough permissions
       security:
-        - admin_auth:
+        - auth:
           - admin
-  /Universities/{UniversitiesId}/{RatingId}:
-    parameters:
-      - name: UniversitiesId
-        in: path
-        description: University ID
-        required: true
-        schema:
-          type: integer
-      - name: RatingId
-        in: path
-        description: Rating ID
-        required: true
-        schema:
-          type: integer
-    get: # get university rating (ID includes year and semestr)
+    delete:
       tags:
-       - Ratings
-      summary: Get a Rating
-      operationId: getRating
-      responses:
-        '200':
-          description: OK
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Rating'
-        '404':
-          description: Not Found
-    post: # create raing(check status)
-      tags:
-        - Ratings
-      summary: Add a Rating
-      operationId: addRating
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/Rating'
-        required: true
-      responses:
-        '200':
-          description: OK
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Rating'
-        '400':
-          description: Bad Request
-        '401': 
-          description: No Permission
-      security:
-        - admin_auth:
-          - admin
-    delete: #delete Rating (check status)
-      tags:
-        - Ratings
-      summary: Delete a Rating
-      operationId: deleteRating
+        - admin
+      summary: Delete the admin
+      operationId: deleteAdmin
+      parameters:
+        - name: admin_id
+          in: path
+          required: true
+          schema:
+            type: integer
+            example: 0
       responses:
         '204':
-          description: No Content
+          description: The admin was deleted
         '404':
-          description: Not Found 
+          description: The admin was not found
         '401':
-          description: No permission
+          description: Unauthorized
+        '403':
+          description: Not enough permissions
       security:
-        - admin_auth:
+        - auth:
           - admin
-  /Students:
-    get: # get Students
+          
+  /admin/login:
+    get:
       tags:
-        - Students
-      summary: Get all Students
-      operationId: getStudents
+        - admin
+      summary: Logs admin into the system
+      operationId: loginAdmin
+      parameters:
+        - name: login
+          in: query
+          description: The login
+          required: true
+          schema:
+            type: string
+        - name: password
+          in: query
+          description: The password
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: successful operation
+          headers:
+            X-Rate-Limit:
+              description: calls per hour allowed by the user
+              schema:
+                type: integer
+                format: int32
+            X-Expires-After:
+              description: date in UTC when token expires
+              schema:
+                type: string
+                format: date-time
+          content:
+            application/xml:
+              schema:
+                type: string
+            application/json:
+              schema:
+                type: string
+        '400':
+          description: Invalid login/password supplied
+          
+  /admin/logout:
+    get:
+      tags:
+        - admin
+      summary: Logs out current logged in admin session
+      description: ''
+      operationId: logoutAdmin
+      parameters: []
+      responses:
+        default:
+          description: successful operation
+      security:
+          - auth:
+            - admin
+  
+  /student:
+    post: 
+      tags: 
+        - student
+      summary: Add a new student
+      operationId: addNewStudent
+      parameters:
+        - name: login
+          in: query
+          required: true
+          example: Dungeon
+          schema:
+            type: string
+            example: Dungeon
+        - name: password
+          in: query
+          required: true
+          schema:
+            type: string
+            example: Master
+      requestBody:
+        description: New student
+        content:
+          application/json:
+              schema:
+                $ref: '#/components/schemas/Student'
+      responses:
+        '200':
+          description: Created a new student
+          content:
+            application/json:
+              schema:
+                type: integer
+                minimum: 0
+        '400':
+          description: Bad request
+        '401':
+          description: Unauthorized
+        '403':
+          description: Not enough permissions
+      security:
+        - auth:
+          - admin
+  
+  /student/{student_id}:
+    get:
+      tags:
+        - student
+      summary: Get the student
+      operationId: getStudent
+      parameters:
+        - name: student_id
+          in: path
+          required: true
+          schema:
+            type: integer
+            minimum: 0
+      responses:
+        '200':
+          description: Ok
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Student'
+        '404':
+          description: The student was not found
+        '401':
+          description: Unauthorized
+        '403':
+          description: Not enough permissions
+      security:
+        - auth:
+          - admin
+          - student # a student can request only himself
+    post:
+      tags:
+        - student
+      summary: Update the student
+      operationId: updateStudent
+      parameters:
+        - name: student_id
+          in: path
+          required: true
+          schema:
+            type: integer
+            minimum: 0
+        - name: new_password
+          in: query
+          required: false
+          schema:
+            type: string
+            example: "secret"
+      requestBody:
+        description: New student
+        content:
+          application/json:
+              schema:
+                $ref: '#/components/schemas/Student'
+      responses:
+        '204':
+          description: The student was updated
+        '404':
+          description: The student was not found
+        '401':
+          description: Unauthorized
+        '403':
+          description: Not enough permissions
+      security:
+        - auth:
+          - admin
+    delete:
+      tags:
+        - student
+      summary: Delete the student
+      operationId: deleteStudent
+      parameters:
+        - name: student_id
+          in: path
+          required: true
+          schema:
+            type: integer
+            minimum: 0
+      responses:
+        '204':
+          description: The student was deleted
+        '404':
+          description: The student was not found
+        '401':
+          description: Unauthorized
+        '403':
+          description: Not enough permissions
+      security:
+        - auth:
+          - admin
+          
+  /student/{student_id}/rating:
+    get:
+      tags:
+        - student
+      summary: Get the student's rating
+      operationId: getStudentRating
+      parameters:
+        - name: student_id
+          in: path
+          required: true
+          schema:
+            type: integer
+            minimum: 0
+        - name: year
+          in: query
+          required: true
+          schema:
+            type: integer
+        - name: semester # 1 or 2
+          in: query
+          required: true
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 2
+      responses:
+        '200':
+          description: Ok
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/StudentRating"
+        '404':
+          description: Student not found
+        '400':
+          description: Bad request
+        '401':
+          description: Unauthorized
+        '403':
+          description: Not enough permissions
+      security:
+        - auth:
+          - admin
+          - student # a student can view only his rating
+  
+  /student/{student_id}/subject/{subject_id}/points:
+    get:
+      tags:
+        - student
+      summary: get the student's subject's points
+      operationId: getStudentSubjectPoints
+      parameters:
+        - name: student_id
+          in: path
+          required: true
+          schema:
+            type: integer
+            minimum: 0
+        - name: subject_id
+          in: path
+          required: true
+          schema:
+            type: integer
+            minimum: 0
+      responses:
+        '200':
+          description: Ok
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  points:
+                    type: integer
+                    minimum: 0
+                  teacher_id:
+                    type: integer
+                    minimum: 0
+        '404':
+          description: The student or the subject not found
+        '400':
+          description: Bad request
+        '401':
+          description: Unauthorized
+        '403':
+          description: Not enough permissions
+      security:
+        - auth:
+          - admin
+          - student # a teacher can view only his subjects' points
+          - teacher # a student can view only his points
+    put:
+      tags:
+        - student
+      summary: update the student's subject's points
+      operationId: updateStudentSubjectPoints
+      parameters:
+        - name: student_id
+          in: path
+          required: true
+          schema:
+            type: integer
+            minimum: 0
+        - name: subject_id
+          in: path
+          required: true
+          schema:
+            type: integer
+            minimum: 0
+        - name: points
+          in: query
+          required: true
+          schema:
+            type: integer
+            minimum: 0
+      responses:
+        '204':
+          description: Ok
+        '404':
+          description: The student or the subject not found
+        '400':
+          description: Bad request
+        '401':
+          description: Unauthorized
+        '403':
+          description: Not enough permissions
+      security:
+        - auth:
+          - admin
+          - teacher # a teacher can changle only his subjects
+          
+  /student/login:
+    get:
+      tags:
+        - student
+      summary: Logs student into the system
+      description: ''
+      operationId: loginStudent
+      parameters:
+        - name: login
+          in: query
+          description: The login
+          required: true
+          schema:
+            type: string
+        - name: password
+          in: query
+          description: The password
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: successful operation
+          headers:
+            X-Rate-Limit:
+              description: calls per hour allowed by the user
+              schema:
+                type: integer
+                format: int32
+            X-Expires-After:
+              description: date in UTC when token expires
+              schema:
+                type: string
+                format: date-time
+          content:
+            application/xml:
+              schema:
+                type: string
+            application/json:
+              schema:
+                type: string
+        '400':
+          description: Invalid login/password supplied
+          
+  /student/logout:
+    get:
+      tags:
+        - student
+      summary: Logs out current logged in student session
+      description: ''
+      operationId: logoutStudent
+      parameters: []
+      responses:
+        default:
+          description: successful operation
+      security:
+        - auth:
+          - student
+  
+  /subject:
+    post:
+      tags:
+        - teacher
+      summary: Create a new subject
+      operationId: createSubject
+      requestBody:
+        description: New subject
+        content:
+          application/json:
+              schema:
+                $ref: '#/components/schemas/Subject'
+      responses:
+        '200':
+          description: Ok
+          content:
+            application/json:
+              schema:
+                type: integer
+                minimum: 0
+        '400':
+          description: Bad request
+        '401':
+          description: Unauthorized
+        '403':
+          description: Not enough permissions
+      security:
+        - auth:
+          - admin
+          - teacher # if teacher sends not his id then '400' bad request
+
+  /subject/{subject_id}:
+    get:
+      tags:
+        - teacher
+      summary: Get the subject
+      operationId: getSubject
+      parameters:
+        - name: subject_id
+          in: path
+          required: true
+          schema:
+            type: integer
+            minimum: 0
+      responses:
+        '200':
+          description: Ok
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Subject'
+        '404':
+          description: Subject not found
+        '400':
+          description: Bad request
+        '401':
+          description: Unauthorized
+        '403':
+          description: Not enough permissions
+      security:
+        - auth:
+          - admin
+          - teacher # a teacher can view only his subjects
+    put:
+      tags:
+        - teacher
+      summary: Update the subject
+      operationId: updateSubject
+      parameters:
+        - name: subject_id
+          in: path
+          required: true
+          schema:
+            type: integer
+            minimum: 0
+      requestBody:
+        description: Subject data
+        content:
+          application/json:
+              schema:
+                $ref: '#/components/schemas/Subject'
+      responses:
+        '200':
+          description: Ok
+          content:
+            application/json:
+              schema:
+                type: integer
+                minimum: 0
+        '400':
+          description: Bad request
+        '401':
+          description: Unauthorized
+        '403':
+          description: Not enough permissions
+      security:
+        - auth:
+          - admin
+          - teacher # a teacher can view only his subjects
+    delete:
+      tags:
+        - teacher
+      summary: Delete the subject
+      operationId: deleteSubject
+      parameters:
+        - name: subject_id
+          in: path
+          required: true
+          schema:
+            type: integer
+            minimum: 0
+      responses:
+        '204':
+          description: Ok
+        '404':
+          description: Subject not found
+        '400':
+          description: Bad request
+        '401':
+          description: Unauthorized
+        '403':
+          description: Not enough permissions
+      security:
+        - auth:
+          - admin
+          - teacher # a teacher can delete only his subjects
+        
+  /teacher:
+    post: 
+      tags: 
+        - teacher
+      summary: Add a new teacher
+      operationId: addNewTeacher
+      parameters:
+        - name: login
+          in: query
+          required: true
+          schema:
+            type: string
+            example: dungeon
+        - name: password
+          in: query
+          required: true
+          schema:
+            type: string
+            example: master123
+      requestBody:
+        description: New student
+        content:
+          application/json:
+              schema:
+                $ref: '#/components/schemas/Teacher'
+      responses:
+        '200':
+          description: Created a new teacher
+          content:
+            application/json:
+              schema:
+                type: integer
+                minimum: 0
+        '400':
+          description: Bad request
+        '401':
+          description: Unauthorized
+        '403':
+          description: Not enough permissions
+      security:
+        - auth:
+          - admin
+          
+  /teacher/{teacher_id}:
+    get:
+      tags:
+        - teacher
+      summary: Get the teacher
+      operationId: getTeacher
+      parameters:
+        - name: teacher_id
+          in: path
+          required: true
+          schema:
+            type: integer
       responses:
         '200':
           description: OK
+          content:
+            application/json:
+                schema:
+                  $ref: '#/components/schemas/Teacher'
+        '404':
+          description: The teacher was not found
+        '401':
+          description: Unauthorized
+        '403':
+          description: Not enough permissions
+      security:
+        - auth:
+          - admin
+          - teacher # teacher can change view himself
+    post:
+      tags:
+        - teacher
+      summary: Update the teacher
+      operationId: updateTeacher
+      parameters:
+        - name: teacher_id
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: new_password
+          in: query
+          required: false
+          schema:
+            type: string
+            example: "secret"
+      responses:
+        '204':
+          description: The teacher was updated
+        '404':
+          description: The teacher was not found
+        '401':
+          description: Unauthorized
+        '403':
+          description: Not enough permissions
+      security:
+        - auth:
+          - admin
+          - teacher # teacher can change only himself
+    delete:
+      tags:
+        - teacher
+      summary: Delete the teacher
+      operationId: deleteTeacher
+      parameters:
+        - name: teacher_id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '204':
+          description: The teacher was deleted
+        '404':
+          description: The teacher was not found
+        '401':
+          description: Unauthorized
+        '403':
+          description: Not enough permissions
+      security:
+        - auth:
+          - admin
+          
+  /teacher/login:
+    get:
+      tags:
+        - teacher
+      summary: Logs teacher into the system
+      description: ''
+      operationId: loginTeacher
+      parameters:
+        - name: login
+          in: query
+          description: The login
+          required: true
+          schema:
+            type: string
+        - name: password
+          in: query
+          description: The password
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: successful operation
+          headers:
+            X-Rate-Limit:
+              description: calls per hour allowed by the user
+              schema:
+                type: integer
+                format: int32
+            X-Expires-After:
+              description: date in UTC when token expires
+              schema:
+                type: string
+                format: date-time
+          content:
+            application/xml:
+              schema:
+                type: string
+            application/json:
+              schema:
+                type: string
+        '400':
+          description: Invalid login/password supplied
+          
+  /teacher/logout:
+    get:
+      tags:
+        - teacher
+      summary: Logs out current logged in teacher session
+      description: ''
+      operationId: logoutTeacher
+      parameters: []
+      responses:
+        default:
+          description: successful operation
+      security:
+        - auth:
+          - admin
+          - teacher
+  
+  /university:
+    get:
+      tags:
+        - university
+      summary: Get all universities
+      operationId: getAllUniversities
+      responses:
+        '200':
+          description: Ok
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/Student'  
-    post: # create Student (check status)
+                  $ref: "#/components/schemas/University"
+    post:
+      summary: Add the university
+      operationId: addUniversity
       tags:
-        - Students
-      summary: Create a Student
-      operationId: createStudent
-      parameters:
-        - name: Studentname
-          in: query
-          description: The Studentname
-          required: true
-          schema:
-            type: string
-      responses:
-        '201':
-          description: Created
+        - university
+      requestBody:
+          description: New university
           content:
             application/json:
-              schema:
-                $ref: '#/components/schemas/Student'
-        '400':
-          description: Bad Request 
-        '401':
-          description: No Permission
-      security:
-        - admin_auth:
-          - admin
-  /Students/{StudentId}:
-    parameters:
-      - name: StudentId
-        in: path
-        description: The id of the Student
-        required: true
-        schema:
-          type: integer
-    get: # get Student
-      tags:
-        - Students
-      summary: Get a Student
-      operationId: getStudent
+                schema:
+                  $ref: '#/components/schemas/University'
       responses:
-        '200':
-          description: OK
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Student'
+        '204':
+          description: The university was created
         '404':
-          description: Not Found
-    put: # update user Student
+          description: The university was not found
+        '401':
+          description: Unauthorized
+        '403':
+          description: Not enough permissions
+      security:
+        - auth:
+          - admin
+          
+  /univesity/{university_id}:
+    post:
+      summary: Update the university
+      operationId: putUniversity
       tags:
-        - Students
-      summary: Edit Student data
-      operationId: editStudent
+        - university
       parameters:
-        - name: username
-          in: query
-          description: Username
+        - name: university_id
+          in: path
           required: true
           schema:
-            type: string
+            type: integer
+            minimum: 0
+      requestBody:
+          description: New university
+          content:
+            application/json:
+                schema:
+                  $ref: '#/components/schemas/University'
+      responses:
+        '204':
+          description: The university was updated
+        '404':
+          description: The university was not found
+        '401':
+          description: Unauthorized
+        '403':
+          description: Not enough permissions
+      security:
+        - auth:
+          - admin
+    delete:
+      tags:
+        - university
+      summary: Delete the university
+      operationId: deleteUniversity
+      parameters:
+        - name: university_id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '204':
+          description: The university was deleted
+        '404':
+          description: The university was not found
+        '401':
+          description: Unauthorized
+        '403':
+          description: Not enough permissions
+      security:
+        - auth:
+          - admin
+  
+  /univesity/{university_id}/rating:
+    get:
+      tags:
+        - university
+      summary: Get the university's rating
+      operationId: getUniversityRating
+      parameters:
+        - name: university_id
+          in: path
+          required: true
+          schema:
+            type: integer
       responses:
         '200':
-          description: OK
+          description: Ok
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Student'
-        '400':
-          description: Bad Request
+                $ref: '#/components/schemas/UniversityRating'
+        '404':
+          description: The university was not found
         '401':
-          description: No Permission
-      security:
-        - admin_auth:
-          - admin
-    delete: # remove Student (check status)
-        tags:
-          - Students
-        summary: Delete a Student
-        operationId: deleteStudent
-        responses:
-          '204':
-            description: No Content
-          '404':
-            description: Not Found
-          '401':
-            description: No Permission
-        security:
-          - admin_auth:
-              - admin
+          description: Unauthorized
+        '403':
+          description: Not enough permissions
+    
+  
 components:
   schemas:
-    University:
+    StudentRating:
       type: object
       properties:
-        id:
-          type: string
-          example: DK6IRG4CAbw
-        title:
-          type: string
-          example: IKHI
-        Ratings:
-          type: array
-          items:
-            $ref: '#/components/schemas/Rating'
-    Student:
-      type: object
-      properties:
-        id:
-          type: integer
-          example: 1
-        Studentame:
-          type: string
-          example: somename
-        University:
-          type: object
-          example: IKHI
-        Ratings:
-          type: array
-          items:
-            $ref: '#/components/schemas/Rating'
-    Rating:
-      type: object
-      properties:
-        ID:
-          type: integer
-          example: 20221
-        Ratelist:
+        subjects:
           type: array
           items:
             type: object
             properties:
-              Student:
-                $ref: '#/components/schemas/Student'
-              Points:
-                type: number
-                example: 99.2417
+              subject_id:
+                type: integer
+                example: 50
+                minimum: 0
+              subject:
+                $ref: "#/components/schemas/Subject"
+              points:
+                type: integer
+                example: 50
+                minimum: 0
+                maximum: 100
+    
+    UniversityRating:
+      type: object
+      properties:
+        subjects:
+          type: array
+          items:
+            type: object
+            properties:
+              student_id:
+                type: integer
+                example: 50
+                minimum: 0
+              student:
+                $ref: "#/components/schemas/Student"
+              points:
+                type: integer
+                example: 50
+                minimum: 0
+                maximum: 100
+    
+    Student:
+      type: object
+      properties:
+        surname:
+          type: string
+          example: dungeon
+        name:
+          type: string
+          example: master
+        university_id:
+          type: integer
+          minimum: 0
+          
+    Teacher:
+      type: object
+      properties:
+        surname:
+          type: string
+          example: dungeon
+        name:
+          type: string
+          example: master
+        university_id:
+          type: integer
+          minimum: 0
+        subjects_ids:
+          type: array
+          items:
+            type: integer
+            example: 1234
+            minimum: 0
+
+    Subject:
+      type: object
+      properties:
+        name:
+          type: string
+          example: Math
+        teachers_ids:
+          type: array
+          items:
+            type: integer
+            example: 1234
+            minimum: 0
+    
+    University:
+      type: object
+      properties:
+        name:
+          type: string
+          example: NULP
+        location:
+          type: string
+          example: Lviv
+    
   securitySchemes:            
-    admin_auth:
+    auth:
       type: oauth2
       flows:
         implicit:
-          authorizationUrl: https://Studrate.com/authorize
+          authorizationUrl: http://localhost/authorize
           scopes:
             admin: All rights
-        
+            teacher: Teacher can edit subjects
+            student: student can view it's rating
+    
