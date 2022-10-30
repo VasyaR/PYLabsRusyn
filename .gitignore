@@ -2,3 +2,5 @@ __pycache__/
 .idea/
 lab6/
 alembic.ini
+venv/
+app.egg-info/

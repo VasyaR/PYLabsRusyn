@@ -18,20 +18,18 @@ paths:
         - admin
       summary: Add a new admin
       operationId: addNewAdmin
-      parameters:
-        - name: login
-          in: query
-          required: true
-          example: Dungeon
-          schema:
-            type: string
-            example: Dungeon
-        - name: password
-          in: query
-          required: true
-          schema:
-            type: string
-            example: Master
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                login:
+                  type: string
+                  example: Sanjo
+                password:
+                  type: string
+                  example: sd355ohf2348d
       responses:
         '200':
           description: Created a new admin
@@ -62,13 +60,16 @@ paths:
           required: true
           schema:
             type: integer
-            example: 0
-        - name: new_password
-          in: query
-          required: false
-          schema:
-            type: string
-            example: "secret"
+            minimum: 0
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                new_password:
+                  type: string
+                  example: sd355ohf2348d
       responses:
         '204':
           description: The admin was updated
@@ -107,24 +108,23 @@ paths:
           - admin
           
   /admin/login:
-    get:
+    post:
       tags:
         - admin
       summary: Logs admin into the system
       operationId: loginAdmin
-      parameters:
-        - name: login
-          in: query
-          description: The login
-          required: true
-          schema:
-            type: string
-        - name: password
-          in: query
-          description: The password
-          required: true
-          schema:
-            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                login:
+                  type: string
+                  example: Sanjo
+                password:
+                  type: string
+                  example: sd355ohf2348d
       responses:
         '200':
           description: successful operation
@@ -158,7 +158,7 @@ paths:
       operationId: logoutAdmin
       parameters: []
       responses:
-        default:
+        '200':
           description: successful operation
       security:
           - auth:
@@ -170,26 +170,20 @@ paths:
         - student
       summary: Add a new student
       operationId: addNewStudent
-      parameters:
-        - name: login
-          in: query
-          required: true
-          example: Dungeon
-          schema:
-            type: string
-            example: Dungeon
-        - name: password
-          in: query
-          required: true
-          schema:
-            type: string
-            example: Master
       requestBody:
-        description: New student
         content:
           application/json:
-              schema:
-                $ref: '#/components/schemas/Student'
+            schema:
+              type: object
+              properties:
+                login:
+                  type: string
+                  example: Sanjo
+                password:
+                  type: string
+                  example: sd355ohf2348d
+                info:
+                  $ref: "#/components/schemas/Student"
       responses:
         '200':
           description: Created a new student
@@ -250,18 +244,15 @@ paths:
           schema:
             type: integer
             minimum: 0
-        - name: new_password
-          in: query
-          required: false
-          schema:
-            type: string
-            example: "secret"
       requestBody:
-        description: New student
         content:
           application/json:
-              schema:
-                $ref: '#/components/schemas/Student'
+            schema:
+              type: object
+              properties:
+                new_password:
+                  type: string
+                  example: sd355ohf2348d
       responses:
         '204':
           description: The student was updated
@@ -390,7 +381,7 @@ paths:
           - admin
           - student # a teacher can view only his subjects' points
           - teacher # a student can view only his points
-    put:
+    post:
       tags:
         - student
       summary: update the student's subject's points
@@ -431,25 +422,24 @@ paths:
           - teacher # a teacher can changle only his subjects
           
   /student/login:
-    get:
+    post:
       tags:
         - student
       summary: Logs student into the system
       description: ''
       operationId: loginStudent
-      parameters:
-        - name: login
-          in: query
-          description: The login
-          required: true
-          schema:
-            type: string
-        - name: password
-          in: query
-          description: The password
-          required: true
-          schema:
-            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                login:
+                  type: string
+                  example: Sanjo
+                password:
+                  type: string
+                  example: sd355ohf2348d
       responses:
         '200':
           description: successful operation
@@ -552,7 +542,7 @@ paths:
         - auth:
           - admin
           - teacher # a teacher can view only his subjects
-    put:
+    post:
       tags:
         - teacher
       summary: Update the subject
@@ -622,25 +612,20 @@ paths:
         - teacher
       summary: Add a new teacher
       operationId: addNewTeacher
-      parameters:
-        - name: login
-          in: query
-          required: true
-          schema:
-            type: string
-            example: dungeon
-        - name: password
-          in: query
-          required: true
-          schema:
-            type: string
-            example: master123
       requestBody:
-        description: New student
         content:
           application/json:
-              schema:
-                $ref: '#/components/schemas/Teacher'
+            schema:
+              type: object
+              properties:
+                login:
+                  type: string
+                  example: Sanjo
+                password:
+                  type: string
+                  example: sd355ohf2348d
+                info:
+                  $ref: "#/components/schemas/Teacher"
       responses:
         '200':
           description: Created a new teacher
@@ -743,25 +728,24 @@ paths:
           - admin
           
   /teacher/login:
-    get:
+    post:
       tags:
         - teacher
       summary: Logs teacher into the system
       description: ''
       operationId: loginTeacher
-      parameters:
-        - name: login
-          in: query
-          description: The login
-          required: true
-          schema:
-            type: string
-        - name: password
-          in: query
-          description: The password
-          required: true
-          schema:
-            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                login:
+                  type: string
+                  example: Sanjo
+                password:
+                  type: string
+                  example: sd355ohf2348d
       responses:
         '200':
           description: successful operation
@@ -831,8 +815,8 @@ paths:
       responses:
         '204':
           description: The university was created
-        '404':
-          description: The university was not found
+        '400':
+          description: University with this name already exists
         '401':
           description: Unauthorized
         '403':
@@ -948,7 +932,7 @@ components:
     UniversityRating:
       type: object
       properties:
-        subjects:
+        rating:
           type: array
           items:
             type: object
@@ -968,10 +952,10 @@ components:
     Student:
       type: object
       properties:
-        surname:
+        last_name:
           type: string
           example: dungeon
-        name:
+        first_name:
           type: string
           example: master
         university_id:
@@ -981,10 +965,10 @@ components:
     Teacher:
       type: object
       properties:
-        surname:
+        last_name:
           type: string
           example: dungeon
-        name:
+        first_name:
           type: string
           example: master
         university_id:
