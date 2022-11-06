@@ -73,20 +73,23 @@ def get_university_rating(university_id):
         DateSchema().load(request.args)
     except ValidationError as err:
         return jsonify(err.messages), 400
-    rows = db_session.query(func.avg(Mark.points), Student).\
-        join(Mark).group_by(Student.id).\
-            filter(Student.university_id == university_id).\
-                filter(Mark.year == int(request.args['year'])).\
-                    filter(Mark.semester == int(request.args['semester'])).all()
-    res = []
-    for row in rows:
-        res.append({
-            'points': row[0],
-            'student': {
-                'first_name': row[1].first_name,
-                'last_name': row[1].last_name,
-                'university_id': row[1].university_id
-            },
-            'student_id': row[1].id
-        })
-    return jsonify({"rating": res}), 200
+    same_id = db_session.query(University).filter(University.id == university_id)
+    if same_id.count() > 0:
+        rows = db_session.query(func.avg(Mark.points), Student).\
+            join(Mark).group_by(Student.id).\
+                filter(Student.university_id == university_id).\
+                    filter(Mark.year == int(request.args['year'])).\
+                        filter(Mark.semester == int(request.args['semester'])).all()
+        res = []
+        for row in rows:
+            res.append({
+                'points': row[0],
+                'student': {
+                    'first_name': row[1].first_name,
+                    'last_name': row[1].last_name,
+                    'university_id': row[1].university_id
+                },
+                'student_id': row[1].id
+            })
+        return jsonify({"rating": res}), 200
+    return jsonify({'message': 'The university was not found'}), 404
