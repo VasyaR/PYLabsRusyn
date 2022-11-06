@@ -250,7 +250,7 @@ paths:
             schema:
               type: object
               properties:
-                new_password:
+                password:
                   type: string
                   example: sd355ohf2348d
       responses:
@@ -354,6 +354,18 @@ paths:
           schema:
             type: integer
             minimum: 0
+        - name: year
+          in: query
+          required: true
+          schema:
+            type: integer
+        - name: semester # 1 or 2
+          in: query
+          required: true
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 2
       responses:
         '200':
           description: Ok
@@ -384,7 +396,7 @@ paths:
     post:
       tags:
         - student
-      summary: update the student's subject's points
+      summary: create or update the student's subject's points
       operationId: updateStudentSubjectPoints
       parameters:
         - name: student_id
@@ -399,12 +411,20 @@ paths:
           schema:
             type: integer
             minimum: 0
-        - name: points
-          in: query
-          required: true
-          schema:
-            type: integer
-            minimum: 0
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                year:
+                  type: integer
+                semester:
+                  type: integer
+                points:
+                  type: integer
+                teacher_id:
+                  type: integer
       responses:
         '204':
           description: Ok
@@ -684,12 +704,12 @@ paths:
           required: true
           schema:
             type: integer
-        - name: new_password
-          in: query
-          required: false
-          schema:
-            type: string
-            example: "secret"
+      requestBody:
+        description: Teacher data
+        content:
+          application/json:
+              schema:
+                $ref: '#/components/schemas/Teacher'
       responses:
         '204':
           description: The teacher was updated
@@ -892,6 +912,18 @@ paths:
           required: true
           schema:
             type: integer
+        - name: year
+          in: query
+          required: true
+          schema:
+            type: integer
+        - name: semester # 1 or 2
+          in: query
+          required: true
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 2
       responses:
         '200':
           description: Ok
@@ -921,8 +953,6 @@ components:
                 type: integer
                 example: 50
                 minimum: 0
-              subject:
-                $ref: "#/components/schemas/Subject"
               points:
                 type: integer
                 example: 50
@@ -1000,7 +1030,7 @@ components:
         name:
           type: string
           example: NULP
-        location:
+        address:
           type: string
           example: Lviv
     
