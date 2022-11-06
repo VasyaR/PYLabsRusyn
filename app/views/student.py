@@ -1,7 +1,7 @@
 from flask import Blueprint, jsonify, request
 from marshmallow import Schema, fields, ValidationError
 from app.db import db_session
-from app.models import Student, Mark, Subject
+from app.models import Student, Mark, Subject, University
 from flask_bcrypt import Bcrypt
 
 mod = Blueprint('student', __name__, url_prefix='/student')
