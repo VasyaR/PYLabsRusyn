@@ -1,7 +1,7 @@
 from flask import Blueprint, jsonify, request
 from marshmallow import Schema, fields, ValidationError
 from app.db import db_session
-from app.models import Teacher, TeachersSubjects
+from app.models import Teacher, TeachersSubjects, Subject, University
 from flask_bcrypt import Bcrypt
 
 mod = Blueprint('teacher', __name__, url_prefix='/teacher')
@@ -26,14 +26,23 @@ def add_teacher():
     except ValidationError as err:
         return jsonify(err.messages), 400
     same_login = db_session.query(Teacher).filter(Teacher.login == request.json['login'])
+    uni = db_session.query(University).filter(University.id == request.json["info"]["university_id"])
+
     if same_login.count() > 0:
         return jsonify({'message': 'Teacher with this login already exists'}), 400
+    if uni.count() == 0:
+        return jsonify({'message': 'The university was not found'}), 400
+    
+    q = db_session.query(Subject).filter(Subject.id.in_(request.json['info']['subject_ids']))
+    if q.count() != len(request.json['info']['subject_ids']):
+        return jsonify({'message': 'Some of the subjects were not found'}), 400
     teacher = Teacher(first_name = request.json['info']['first_name'], last_name = request.json['info']['last_name'], university_id = request.json['info']['university_id'], login = request.json['login'], password = bcrypt.generate_password_hash(request.json['password']))
     db_session.add(teacher)
     db_session.commit()
     for subject_id in request.json['info']['subject_ids']:
         teacher_subject = TeachersSubjects(teacher_id = teacher.id, subject_id = subject_id)
         db_session.add(teacher_subject)
+
     db_session.commit()
     return jsonify(teacher.id), 200
 
@@ -63,9 +72,17 @@ def update_teacher(teacher_id):
         return jsonify(err.messages), 400
     same_id = db_session.query(Teacher).filter(Teacher.id == teacher_id)
     if same_id.count() > 0:
+        uni = db_session.query(University).filter(University.id == request.json['university_id'])
+        if uni.count() == 0:
+            return jsonify({'message': 'University was not found'}), 404
+        q = db_session.query(Subject).filter(Subject.id.in_(request.json['subject_ids']))
+        if q.count() != len(request.json['subject_ids']):
+            return jsonify({'message': 'Some of the subjects were not found'}), 400
+        
         same_id.first().first_name = request.json['first_name']
         same_id.first().last_name = request.json['last_name']
         same_id.first().university_id = request.json['university_id']
+
         for teacher_subject in db_session.query(TeachersSubjects).filter(TeachersSubjects.teacher_id == teacher_id):
             db_session.delete(teacher_subject)
         for subject_id in request.json['subject_ids']:
