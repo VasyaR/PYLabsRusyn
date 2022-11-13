@@ -3,11 +3,23 @@ from marshmallow import Schema, fields, ValidationError
 from app.db import db_session
 from app.models import Subject, TeachersSubjects, Mark, Teacher
 from flask_bcrypt import Bcrypt
+from app import app
+from flask_jwt_extended import (
+    JWTManager, jwt_required, create_access_token,
+    get_jwt_identity
+)
+jwt = JWTManager(app)
+
+mod = Blueprint('teacher', __name__, url_prefix='/teacher')
+bcrypt = Bcrypt()
 
 mod = Blueprint('subject', __name__, url_prefix='/subject')
 
 @mod.route('/', methods=['POST'])
+@jwt_required()
 def add_subject():
+    if get_jwt_identity()["role"] != "admin":
+    	return jsonify({'error': 'Not enough permission'}), 403
     try:
         class SubjectSchema(Schema):
             name = fields.Str(required=True)
@@ -47,7 +59,10 @@ def get_subject(subject_id):
     return jsonify({'message': 'The subject was not found'}), 404
 
 @mod.route('/<int:subject_id>', methods=['POST'])
+@jwt_required()
 def update_subject(subject_id):
+    if get_jwt_identity()["role"] != "admin":
+    	return jsonify({'error': 'Not enough permission'}), 403
     try:
         class SubjectSchema(Schema):
             name = fields.Str(required=True)
@@ -80,7 +95,10 @@ def update_subject(subject_id):
     return jsonify({'message': 'The subject was not found'}), 404
 
 @mod.route('/<int:subject_id>', methods=['DELETE'])
+@jwt_required()
 def delete_subject(subject_id):
+    if get_jwt_identity()["role"] != "admin":
+    	return jsonify({'error': 'Not enough permission'}), 403
     same_id = db_session.query(Subject).filter(Subject.id == subject_id)
     if same_id.count() > 0:
         db_session.delete(same_id.first())
