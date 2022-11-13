@@ -4,7 +4,7 @@ from app.models import *
 import pg8000
 
 
-engine = create_engine("postgresql+pg8000://postgres:123456@localhost:5432/postgres", echo=True)
+engine = create_engine("postgresql://admin:admin@localhost/pp", echo=True)
 
 metadata = MetaData(engine)
 Session = sessionmaker(bind=engine)

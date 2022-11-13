@@ -148,6 +148,10 @@ paths:
                 type: string
         '400':
           description: Invalid login/password supplied
+        '404':
+          description: User not found
+        '401':
+          description: Incorrect password
           
   /admin/logout:
     get:
@@ -483,6 +487,10 @@ paths:
                 type: string
         '400':
           description: Invalid login/password supplied
+        '401':
+          description: incorrect password
+        '404':
+          description: User not found
           
   /student/logout:
     get:
@@ -528,7 +536,6 @@ paths:
       security:
         - auth:
           - admin
-          - teacher # if teacher sends not his id then '400' bad request
 
   /subject/{subject_id}:
     get:
@@ -552,16 +559,6 @@ paths:
                 $ref: '#/components/schemas/Subject'
         '404':
           description: Subject not found
-        '400':
-          description: Bad request
-        '401':
-          description: Unauthorized
-        '403':
-          description: Not enough permissions
-      security:
-        - auth:
-          - admin
-          - teacher # a teacher can view only his subjects
     post:
       tags:
         - teacher
@@ -615,16 +612,11 @@ paths:
           description: Ok
         '404':
           description: Subject not found
-        '400':
-          description: Bad request
-        '401':
-          description: Unauthorized
         '403':
           description: Not enough permissions
       security:
         - auth:
           - admin
-          - teacher # a teacher can delete only his subjects
         
   /teacher:
     post: 
@@ -933,10 +925,6 @@ paths:
                 $ref: '#/components/schemas/UniversityRating'
         '404':
           description: The university was not found
-        '401':
-          description: Unauthorized
-        '403':
-          description: Not enough permissions
     
   
 components:
@@ -1004,7 +992,7 @@ components:
         university_id:
           type: integer
           minimum: 0
-        subjects_ids:
+        subject_ids:
           type: array
           items:
             type: integer
@@ -1017,7 +1005,7 @@ components:
         name:
           type: string
           example: Math
-        teachers_ids:
+        teacher_ids:
           type: array
           items:
             type: integer

@@ -1,5 +1,6 @@
 from flask import Flask
 app = Flask(__name__)
+app.config["SECRET_KEY"] = "troll"
 
 from app.views import admin
 from app.views import student

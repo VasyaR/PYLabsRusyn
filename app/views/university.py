@@ -4,11 +4,21 @@ from marshmallow import Schema, fields, ValidationError
 from app.db import db_session
 from app.models import University, Mark, Student
 from flask_bcrypt import Bcrypt
+from app import app
+from flask_jwt_extended import (
+    JWTManager, jwt_required, create_access_token,
+    get_jwt_identity
+)
+jwt = JWTManager(app)
+bcrypt = Bcrypt()
 
 mod = Blueprint('university', __name__, url_prefix='/university')
 
 @mod.route('/', methods=['POST'])
+@jwt_required()
 def add_university():
+    if get_jwt_identity()["role"] != "admin":
+    	return jsonify({'error': 'Not enough permission'}), 403
     try:
         class UniversitySchema(Schema):
             name = fields.Str(required=True)
@@ -38,7 +48,10 @@ def get_universities():
     return jsonify(res), 200
 
 @mod.route('/<int:university_id>', methods=['POST'])
+@jwt_required()
 def update_university(university_id):
+    if get_jwt_identity()["role"] != "admin":
+    	return jsonify({'error': 'Not enough permission'}), 403
     try:
         class UniversitySchema(Schema):
             name = fields.Str(required=True)
@@ -56,7 +69,10 @@ def update_university(university_id):
     return jsonify({'message': 'The university was not found'}), 404
 
 @mod.route('/<int:university_id>', methods=['DELETE'])
+@jwt_required()
 def delete_university(university_id):
+    if get_jwt_identity()["role"] != "admin":
+    	return jsonify({'error': 'Not enough permission'}), 403
     same_id = db_session.query(University).filter(University.id == university_id)
     if same_id.count() > 0:
         db_session.delete(same_id.first())
