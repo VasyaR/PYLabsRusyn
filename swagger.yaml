@@ -427,8 +427,6 @@ paths:
                   type: integer
                 points:
                   type: integer
-                teacher_id:
-                  type: integer
       responses:
         '204':
           description: Ok
