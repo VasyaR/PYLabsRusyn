@@ -157,7 +157,7 @@ def update_student_subject_points(student_id, subject_id):
         if get_jwt_identity()["role"] == "student" or get_jwt_identity()["role"] == "admin":
             return jsonify({"error": "Not enough permission"}), 403
         if get_jwt_identity()["role"] == "teacher":
-            access_check_for_teacher = db_session.query(TeachersSubjects).filter(TeachersSubjects.subject_id == subject_id, TeachersSubjects.teacher_id == get_jwt_identity()["id"])
+            access_check_for_teacher = db_session.query(TeachersSubjects).filter(TeachersSubjects.subject_id == subject_id, TeachersSubjects.teacher_id == get_jwt_identity()["id"]).first()
             if access_check_for_teacher is None:
                 return jsonify({"error": "Not enough permission"}), 403
         mark = db_session.query(Mark).filter(Mark.student_id == student_id, Mark.subject_id == subject_id, Mark.year == year, Mark.semester == semester)
