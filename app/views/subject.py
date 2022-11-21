@@ -19,7 +19,7 @@ mod = Blueprint('subject', __name__, url_prefix='/subject')
 @jwt_required()
 def add_subject():
     if get_jwt_identity()["role"] != "admin":
-    	return jsonify({'error': 'Not enough permission'}), 403
+        return jsonify({'error': 'Not enough permission'}), 403
     try:
         class SubjectSchema(Schema):
             name = fields.Str(required=True)
@@ -62,7 +62,7 @@ def get_subject(subject_id):
 @jwt_required()
 def update_subject(subject_id):
     if get_jwt_identity()["role"] != "admin":
-    	return jsonify({'error': 'Not enough permission'}), 403
+        return jsonify({'error': 'Not enough permission'}), 403
     try:
         class SubjectSchema(Schema):
             name = fields.Str(required=True)
@@ -98,7 +98,7 @@ def update_subject(subject_id):
 @jwt_required()
 def delete_subject(subject_id):
     if get_jwt_identity()["role"] != "admin":
-    	return jsonify({'error': 'Not enough permission'}), 403
+        return jsonify({'error': 'Not enough permission'}), 403
     same_id = db_session.query(Subject).filter(Subject.id == subject_id)
     if same_id.count() > 0:
         db_session.delete(same_id.first())

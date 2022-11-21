@@ -3,3 +3,5 @@
 lab6/
 venv/
 app.egg-info/
+test.db
+.coverage

@@ -17,7 +17,7 @@ bcrypt = Bcrypt()
 @jwt_required()
 def add_student():
     if get_jwt_identity()["role"] != "admin":
-    	return jsonify({'error': 'Not enough permission'}), 403
+        return jsonify({'error': 'Not enough permission'}), 403
     try:
         class CredentialsSchema(Schema):
             login = fields.Str(required=True)
@@ -47,8 +47,8 @@ def add_student():
 @jwt_required()
 def get_student(student_id):
     if get_jwt_identity()["role"] != "admin":
-    	if not (get_jwt_identity()["role"] == "student" and get_jwt_identity()["id"] == student_id):
-    		return jsonify({"error": "Not enough permission"}), 403
+        if not (get_jwt_identity()["role"] == "student" and get_jwt_identity()["id"] == student_id):
+            return jsonify({"error": "Not enough permission"}), 403
     same_id = db_session.query(Student).filter(Student.id == student_id)
     if same_id.count() > 0:
         res = {}
@@ -62,8 +62,8 @@ def get_student(student_id):
 @jwt_required()
 def update_student(student_id):
     if get_jwt_identity()["role"] != "admin":
-    	if not (get_jwt_identity()["role"] == "student" and get_jwt_identity()["id"] == student_id):
-    		return jsonify({"error": "Not enough permission"}), 403
+        if not (get_jwt_identity()["role"] == "student" and get_jwt_identity()["id"] == student_id):
+            return jsonify({"error": "Not enough permission"}), 403
     try:
         class StudentPasswordSchema(Schema):
             password = fields.Str(required=True)
@@ -82,7 +82,7 @@ def update_student(student_id):
 @jwt_required()
 def delete_student(student_id):
     if get_jwt_identity()["role"] != "admin":
-    	return jsonify({'error': 'Not enough permission'}), 403
+        return jsonify({'error': 'Not enough permission'}), 403
     same_id = db_session.query(Student).filter(Student.id == student_id)
     if same_id.count() > 0:
         db_session.delete(same_id.first())
@@ -94,8 +94,8 @@ def delete_student(student_id):
 @jwt_required()
 def get_student_rating(student_id):
     if get_jwt_identity()["role"] != "admin":
-    	if not (get_jwt_identity()["role"] == "student" and get_jwt_identity()["id"] == student_id):
-    		return jsonify({"error": "Not enough permission"}), 403
+        if not (get_jwt_identity()["role"] == "student" and get_jwt_identity()["id"] == student_id):
+            return jsonify({"error": "Not enough permission"}), 403
     try:
         class DateSchema(Schema):
             year = fields.Int(required=True)
@@ -130,8 +130,6 @@ def get_student_subject(student_id, subject_id):
     year = int(request.args.get('year'))
     semester = int(request.args.get('semester'))
     mark = db_session.query(Mark).filter(Mark.student_id == student_id, Mark.subject_id == subject_id, Mark.year == year, Mark.semester == semester)
-    print("zxc")
-    print(get_jwt_identity()["id"])
     if mark.count() > 0:
         if get_jwt_identity()["role"] != "admin":
             if not (get_jwt_identity()["role"] == "student" and get_jwt_identity()["id"] == student_id):
@@ -161,7 +159,7 @@ def update_student_subject_points(student_id, subject_id):
             if access_check_for_teacher is None:
                 return jsonify({"error": "Not enough permission"}), 403
         mark = db_session.query(Mark).filter(Mark.student_id == student_id, Mark.subject_id == subject_id, Mark.year == year, Mark.semester == semester)
-        if mark.count() > 0:	
+        if mark.count() > 0:    
             mark = mark.first()
             mark.points = request.json.get('points')
             mark.teacher_id = get_jwt_identity()["id"] # check if teacher is the same(maybe)
@@ -174,29 +172,23 @@ def update_student_subject_points(student_id, subject_id):
     
 @mod.route("/login", methods=["POST"])
 def login():
-	class Studentinfo(Schema):
-		login = fields.Str(required=True)
-		password = fields.Str(required=True)
-	try:
-		if not request.json:
-			raise ValidationError('No input data provided')
-		Studentinfo().load(request.json)
-	except ValidationError as err:
-		return jsonify(err.messages), 400
-		
-	db_student = db_session.query(Student).filter(Student.login == request.json['login']).first()
-	if db_student is None:
-        	return jsonify({'message': 'User not found'}), 404
-	
-	if not bcrypt.check_password_hash(db_student.password, request.json['password']):
-        	return jsonify({'message': 'Incorrect password'}), 401
+    class Studentinfo(Schema):
+        login = fields.Str(required=True)
+        password = fields.Str(required=True)
+    try:
+        if not request.json:
+            raise ValidationError('No input data provided')
+        Studentinfo().load(request.json)
+    except ValidationError as err:
+        return jsonify(err.messages), 400
         
-	student_identity = {"id": db_student.id, "role": "student"}
-	access_token = create_access_token(identity=student_identity)
-	return jsonify({'token': access_token}), 200
-    	
-@mod.route('/logout', methods=['GET'])
-@jwt_required()
-def logout():
-	return jsonify({'message': 'Logged out'}), 200
-    	
+    db_student = db_session.query(Student).filter(Student.login == request.json['login']).first()
+    if db_student is None:
+            return jsonify({'message': 'User not found'}), 404
+    
+    if not bcrypt.check_password_hash(db_student.password, request.json['password']):
+            return jsonify({'message': 'Incorrect password'}), 401
+        
+    student_identity = {"id": db_student.id, "role": "student"}
+    access_token = create_access_token(identity=student_identity)
+    return jsonify({'token': access_token}), 200

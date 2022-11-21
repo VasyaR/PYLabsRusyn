@@ -9,7 +9,6 @@ from flask_jwt_extended import (
     get_jwt_identity
 )
 jwt = JWTManager(app)
-
 mod = Blueprint('teacher', __name__, url_prefix='/teacher')
 bcrypt = Bcrypt()
 
@@ -17,7 +16,7 @@ bcrypt = Bcrypt()
 @jwt_required()
 def add_teacher():
     if get_jwt_identity()["role"] != "admin":
-    	return jsonify({'error': 'Not enough permission'}), 403
+        return jsonify({'error': 'Not enough permission'}), 403
     try:
         class CredentialsSchema(Schema):
             login = fields.Str(required=True)
@@ -59,8 +58,8 @@ def add_teacher():
 @jwt_required()
 def get_teacher(teacher_id):
     if get_jwt_identity()["role"] != "admin":
-    	if not (get_jwt_identity()["role"] == "teacher" and get_jwt_identity()["id"] == teacher_id):
-    		return jsonify({"error": "Not enough permission"}), 403
+        if not (get_jwt_identity()["role"] == "teacher" and get_jwt_identity()["id"] == teacher_id):
+            return jsonify({"error": "Not enough permission"}), 403
     same_id = db_session.query(Teacher).filter(Teacher.id == teacher_id)
     if same_id.count() > 0:
         return jsonify({
@@ -75,8 +74,8 @@ def get_teacher(teacher_id):
 @jwt_required()
 def update_teacher(teacher_id):
     if get_jwt_identity()["role"] != "admin":
-    	if not (get_jwt_identity()["role"] == "teacher" and get_jwt_identity()["id"] == teacher_id):
-    		return jsonify({"error": "Not enough permission"}), 403
+        if not (get_jwt_identity()["role"] == "teacher" and get_jwt_identity()["id"] == teacher_id):
+            return jsonify({"error": "Not enough permission"}), 403
     try:
         class TeacherSchema(Schema):
             first_name = fields.Str(required=True)
@@ -91,7 +90,7 @@ def update_teacher(teacher_id):
     if same_id.count() > 0:
         uni = db_session.query(University).filter(University.id == request.json['university_id'])
         if uni.count() == 0:
-            return jsonify({'message': 'University was not found'}), 404
+            return jsonify({'message': 'University was not found'}), 400
         q = db_session.query(Subject).filter(Subject.id.in_(request.json['subject_ids']))
         if q.count() != len(request.json['subject_ids']):
             return jsonify({'message': 'Some of the subjects were not found'}), 400
@@ -113,7 +112,7 @@ def update_teacher(teacher_id):
 @jwt_required()
 def delete_teacher(teacher_id):
     if get_jwt_identity()["role"] != "admin":
-    	return jsonify({'error': 'Not enough permission'}), 403
+        return jsonify({'error': 'Not enough permission'}), 403
     same_id = db_session.query(Teacher).filter(Teacher.id == teacher_id)
     if same_id.count() > 0:
         db_session.delete(same_id.first())
@@ -123,28 +122,28 @@ def delete_teacher(teacher_id):
     
 @mod.route("/login", methods=["POST"])
 def login():
-	class Teacherinfo(Schema):
-		login = fields.Str(required=True)
-		password = fields.Str(required=True)
-	try:
-		if not request.json:
-			raise ValidationError('No input data provided')
-		Teacherinfo().load(request.json)
-	except ValidationError as err:
-		return jsonify(err.messages), 400
-		
-	db_teacher = db_session.query(Teacher).filter(Teacher.login == request.json['login']).first()
-	if db_teacher is None:
-        	return jsonify({'message': 'User not found'}), 404
-	
-	if not bcrypt.check_password_hash(db_teacher.password, request.json['password']):
-        	return jsonify({'message': 'Incorrect password'}), 401
+    class Teacherinfo(Schema):
+        login = fields.Str(required=True)
+        password = fields.Str(required=True)
+    try:
+        if not request.json:
+            raise ValidationError('No input data provided')
+        Teacherinfo().load(request.json)
+    except ValidationError as err:
+        return jsonify(err.messages), 400
         
-	teacher_identity = {"id": db_teacher.id, "role": "teacher"}
-	access_token = create_access_token(identity=teacher_identity)
-	return jsonify({'token': access_token}), 200
-    	
+    db_teacher = db_session.query(Teacher).filter(Teacher.login == request.json['login']).first()
+    if db_teacher is None:
+            return jsonify({'message': 'User not found'}), 404
+    
+    if not bcrypt.check_password_hash(db_teacher.password, request.json['password']):
+            return jsonify({'message': 'Incorrect password'}), 401
+        
+    teacher_identity = {"id": db_teacher.id, "role": "teacher"}
+    access_token = create_access_token(identity=teacher_identity)
+    return jsonify({'token': access_token}), 200
+        
 @mod.route('/logout', methods=['GET'])
 @jwt_required()
 def logout():
-	return jsonify({'message': 'Logged out'}), 200
+    return jsonify({'message': 'Logged out'}), 200
