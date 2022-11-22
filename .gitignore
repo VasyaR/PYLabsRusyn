@@ -1,6 +1,7 @@
-__pycache__/
+**/__pycache__/
 .idea/
 lab6/
-alembic.ini
 venv/
 app.egg-info/
+test.db
+.coverage

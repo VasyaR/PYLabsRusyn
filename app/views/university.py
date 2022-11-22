@@ -18,7 +18,7 @@ mod = Blueprint('university', __name__, url_prefix='/university')
 @jwt_required()
 def add_university():
     if get_jwt_identity()["role"] != "admin":
-    	return jsonify({'error': 'Not enough permission'}), 403
+        return jsonify({'error': 'Not enough permission'}), 403
     try:
         class UniversitySchema(Schema):
             name = fields.Str(required=True)
@@ -51,7 +51,7 @@ def get_universities():
 @jwt_required()
 def update_university(university_id):
     if get_jwt_identity()["role"] != "admin":
-    	return jsonify({'error': 'Not enough permission'}), 403
+        return jsonify({'error': 'Not enough permission'}), 403
     try:
         class UniversitySchema(Schema):
             name = fields.Str(required=True)
@@ -72,7 +72,7 @@ def update_university(university_id):
 @jwt_required()
 def delete_university(university_id):
     if get_jwt_identity()["role"] != "admin":
-    	return jsonify({'error': 'Not enough permission'}), 403
+        return jsonify({'error': 'Not enough permission'}), 403
     same_id = db_session.query(University).filter(University.id == university_id)
     if same_id.count() > 0:
         db_session.delete(same_id.first())
